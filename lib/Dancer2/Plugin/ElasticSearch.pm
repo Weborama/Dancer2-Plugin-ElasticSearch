@@ -52,3 +52,54 @@ register 'elastic' => sub {
 register_plugin;
 
 1;
+__END__
+=pod
+
+=head1 SYNOPSIS
+
+  use Dancer2::Plugin::ElasticSearch;
+  get '/count_all_docs' => sub {
+    return elastic->search(search_type => 'count',
+                           body => { query => { match_all => {} } });
+  }
+
+=head1 DESCRIPTION
+
+This Dancer2 plugin handles connection configuration and
+fork-and-thread safety for ElasticSearch connectors.
+
+=head1 KEYWORDS
+
+=head2 elastic
+
+  elastic->ping;
+  elastic('other')->ping;
+
+Return a L<Search::Elasticsearch::Client> subclass suitable for
+running queries against an ElasticSearch instance.  Each thread is
+guaranteed to have its own client instances.  If a connection already
+exists for a given configuration name, it is returned instead of being
+re-created.
+
+If a configuration name is not passed, "default" is assumed.
+
+=head1 CONFIGURATION
+
+  plugins:
+    ElasticSearch:
+      default:
+        params:
+          nodes: localhost:9200
+      other:
+        params: etc
+
+The C<params> hashref must contain a map of parameters that can be
+passed directly to the L<Search::Elasticsearch> constructor.  In the
+above example, calling C<elastic> (or C<elastic('default')>) will
+result in
+
+  Search::Elasticsearch->new(nodes => 'localhost:9200');
+
+=head1 SEE ALSO
+
+L<Search::Elasticsearch>, L<Dancer2>
