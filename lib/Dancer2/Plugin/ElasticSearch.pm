@@ -100,6 +100,17 @@ result in
 
   Search::Elasticsearch->new(nodes => 'localhost:9200');
 
+=head1 INSTALLATION
+
+You can install this module as you would any Perl module.
+
+During installation, the unit tests will run queries against a local
+ElasticSearch instance if there is one (read-only queries, of
+course!).  If you have no local ElasticSearch instance, but still wish
+to run the unit tests, set the C<D2_PLUGIN_ES> variable to
+"$host:$port".  If no instance can be reached, the tests will be
+safely skipped.
+
 =head1 SEE ALSO
 
 L<Search::Elasticsearch>, L<Dancer2>
