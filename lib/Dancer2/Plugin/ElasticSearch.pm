@@ -11,7 +11,7 @@ use utf8;
 
 use Search::Elasticsearch;
 use Try::Tiny;
-use Dancer2::Plugin qw/:no_dsl/;
+use Dancer2::Plugin;
 
 our $handles = {};
 
