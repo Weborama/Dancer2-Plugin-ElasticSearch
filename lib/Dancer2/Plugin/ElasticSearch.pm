@@ -10,7 +10,6 @@ use autodie;
 use utf8;
 
 use Search::Elasticsearch;
-use Try::Tiny;
 use Dancer2::Plugin;
 
 our $handles = {};
@@ -33,16 +32,11 @@ register 'elastic' => sub {
         }
         my $config = $plugin_config->{$name};
         my $params = $config->{params} // {};
-        try {
-            $elastic = Search::Elasticsearch->new(%{$params});
-            # S::E does not actually connect until it needs to, but
-            # we're already not creating the S::E object until we need
-            # one!
-            $elastic->ping;
-        } catch {
-            my $error = $_;
-            die "Could not connect to ElasticSearch: $error";
-        };
+
+        $elastic = Search::Elasticsearch->new(%{$params});
+        # try the connection; the ES client will throw a NoNodes
+        # exception if something is wrong
+        $elastic->ping;
         $handles->{$pid_tid}{$name} = $elastic;
     }
 
@@ -79,7 +73,10 @@ Return a L<Search::Elasticsearch::Client> subclass suitable for
 running queries against an ElasticSearch instance.  Each thread is
 guaranteed to have its own client instances.  If a connection already
 exists for a given configuration name, it is returned instead of being
-re-created.
+re-created.  If a new connection is created, C<ping> is immediately
+called to check it; this may throw an
+L<exception|Search::Elasticsearch::Error> if there is in fact an issue
+with the cluster.
 
 If a configuration name is not passed, "default" is assumed.
 
